@@ -60,7 +60,7 @@
         >{@html alertCircleIcon}</span
       >
       {#if errorStatus}
-        <p class="mb-2 text-3xl font-medium text-red-600">
+        <p class="mb-2 text-2xl font-medium text-red-600">
           Error {errorStatus}
         </p>
       {/if}
@@ -71,14 +71,11 @@
     <div
       class="flex h-full flex-col items-center justify-center p-6 text-center"
     >
-      <span
-        class="mb-3 block h-12 w-12 text-neutral-500 [&>svg]:h-full [&>svg]:w-full"
+      <span class="mb-3 block h-12 w-12 [&>svg]:h-full [&>svg]:w-full"
         >{@html searchIcon}</span
       >
-      <p class="text-xl">No results found.</p>
-      <p class="mt-1 text-lg text-neutral-400">
-        Try adjusting your search filters.
-      </p>
+      <p class="text-2xl">No results found.</p>
+      <p class="mt-1 text-xl">Try adjusting your search filters.</p>
     </div>
   {:else if hasSearched}
     <!-- Results list -->
@@ -105,8 +102,8 @@
       <span class="mb-3 block h-12 w-12 [&>svg]:h-full [&>svg]:w-full"
         >{@html searchIcon}</span
       >
-      <p class="text-xl">No results yet.</p>
-      <p class="mt-1 text-lg">Search results will appear here.</p>
+      <p class="text-2xl">No results yet.</p>
+      <p class="mt-1 text-xl">Search results will appear here.</p>
     </div>
   {/if}
 </main>
