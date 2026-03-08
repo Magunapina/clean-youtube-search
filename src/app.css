@@ -1,0 +1,57 @@
+@import "tailwindcss";
+
+@layer base {
+  :root {
+    font-family: "Noto Sans", sans-serif;
+  }
+  :lang(ja) {
+    font-family:
+      "Noto Sans JP", "Noto Sans TC", "Noto Sans SC", "Noto Sans KR",
+      "Noto Sans", sans-serif;
+  }
+  :lang(zh),
+  :lang(zh-Hans),
+  :lang(zh-CN),
+  :lang(zh-SG) {
+    font-family:
+      "Noto Sans SC", "Noto Sans TC", "Noto Sans JP", "Noto Sans KR",
+      "Noto Sans", sans-serif;
+  }
+  :lang(zh-Hant),
+  :lang(zh-TW),
+  :lang(zh-HK),
+  :lang(zh-MO) {
+    font-family:
+      "Noto Sans TC", "Noto Sans JP", "Noto Sans SC", "Noto Sans KR",
+      "Noto Sans", sans-serif;
+  }
+  :lang(ko) {
+    font-family:
+      "Noto Sans KR", "Noto Sans JP", "Noto Sans TC", "Noto Sans SC",
+      "Noto Sans", sans-serif;
+  }
+  :lang(ar) {
+    font-family: "Noto Sans Arabic", "Noto Sans", sans-serif;
+  }
+  :lang(hi) {
+    font-family: "Noto Sans Devanagari", "Noto Sans", sans-serif;
+  }
+  :lang(th) {
+    font-family: "Noto Sans Thai", "Noto Sans", sans-serif;
+  }
+}
+
+* {
+  color-scheme: dark;
+  scrollbar-width: none;
+}
+
+main {
+  scrollbar-width: thin;
+}
+
+/* Fix datetime-local inputs on WebKit */
+input[type="datetime-local"] {
+  appearance: none;
+  height: 3rem;
+}
