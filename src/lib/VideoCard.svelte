@@ -115,11 +115,11 @@
       href="https://www.youtube.com/watch?v={video.id}"
       target="_blank"
       rel="noopener noreferrer"
-      class="w-fit outline-none focus-visible:underline"
+      class="inline-block max-w-full outline-none focus-visible:underline"
       {lang}
     >
       <h3
-        class="line-clamp-2 text-lg leading-snug font-medium text-neutral-100"
+        class="line-clamp-2 text-lg leading-snug font-medium wrap-anywhere text-neutral-100"
       >
         {video.snippet?.title ?? "Untitled"}
       </h3>
@@ -209,7 +209,7 @@
             video.snippet?.channelId}"
           target="_blank"
           rel="noopener noreferrer"
-          class="w-fit truncate transition-colors outline-none hover:text-neutral-300 focus-visible:underline"
+          class="inline-block max-w-full truncate transition-colors outline-none hover:text-neutral-300 focus-visible:underline"
           lang={channelLang}
         >
           {channel?.snippet?.title ?? video.snippet?.channelTitle ?? "Unknown"}
@@ -219,7 +219,9 @@
 
     {#if video.snippet?.description}
       <div class="hidden lg:mt-4 lg:block" {lang}>
-        <p class="line-clamp-3 text-sm leading-relaxed font-normal">
+        <p
+          class="line-clamp-3 text-sm leading-relaxed font-normal wrap-anywhere"
+        >
           {video.snippet.description}
         </p>
       </div>
