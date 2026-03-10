@@ -4,6 +4,7 @@
   import SearchSidebar from "./lib/SearchSidebar.svelte";
   import SearchResults from "./lib/SearchResults.svelte";
   import menuIcon from "./assets/menu.svg?raw";
+  import { onMount } from "svelte";
 
   // ── Search form state ───────────────────────────────
   let keyword = $state("");
@@ -18,6 +19,51 @@
   let videoLicense = $state<SearchParams["videoLicense"]>("any");
   let safeSearch = $state<SearchParams["safeSearch"]>("none");
   let formRef = $state<HTMLFormElement>();
+  let searchedKeyword = $state("");
+
+  function loadStateFromUrl() {
+    const params = new URLSearchParams(window.location.search);
+
+    // Reset to defaults first to handle deleted keys during history pop
+    keyword = "";
+    channelId = "";
+    order = "relevance";
+    videoDuration = "any";
+    eventType = "";
+    publishedAfter = "";
+    publishedBefore = "";
+    relevanceLanguage = "";
+    videoDimension = "any";
+    videoLicense = "any";
+    safeSearch = "none";
+
+    for (const [key, value] of params.entries()) {
+      handleFieldUpdate(key === "q" ? "keyword" : key, value);
+    }
+  }
+
+  onMount(() => {
+    loadStateFromUrl();
+
+    if (keyword || channelId) {
+      // Small delay to ensure form bindings are ready
+      // Seed initial history state so popping back to page 0 works securely
+      window.history.replaceState({ pageIndex: 0 }, "", window.location.href);
+      setTimeout(() => search.fetchPage(getFormState(), formRef, 0), 0);
+    }
+  });
+
+  function onPopState(e: PopStateEvent) {
+    loadStateFromUrl();
+    if (keyword || channelId) {
+      const targetPageIndex = e.state?.pageIndex ?? 0;
+      search.fetchPage(getFormState(), formRef, targetPageIndex);
+      searchedKeyword = keyword; // Restore tab title
+    } else {
+      search.resetAll();
+      searchedKeyword = "";
+    }
+  }
 
   // ── Results state ───────────────────────────────────
   const search = createSearchState();
@@ -102,33 +148,74 @@
     }
   }
 
-  async function handleSearch() {
+  async function handleSearch(pushHistory = true) {
     search.resetCache();
-    await search.fetchPage(getFormState(), formRef);
+
+    const state = getFormState();
+    const defaults: Record<string, string> = {
+      order: "relevance",
+      videoDuration: "any",
+      videoDimension: "any",
+      videoLicense: "any",
+      safeSearch: "none",
+    };
+
+    if (pushHistory) {
+      // Update URL with current form state
+      // eslint-disable-next-line
+      const params = new URLSearchParams();
+      for (const [key, value] of Object.entries(state)) {
+        if (value && value !== defaults[key]) {
+          params.set(key === "keyword" ? "q" : key, String(value));
+        }
+      }
+
+      const newUrl = params.toString()
+        ? `${window.location.pathname}?${params.toString()}`
+        : window.location.pathname;
+      window.history.pushState({ pageIndex: 0 }, "", newUrl);
+    }
+
+    await search.fetchPage(state, formRef, 0);
+    searchedKeyword = state.keyword;
     sidebarOpen = false;
     resultsRef?.scrollToTop();
   }
 
   async function goNextPage() {
     if (!search.nextPageToken) return;
-    search.pageIndex++;
-    await search.fetchPage(getFormState(), formRef, search.nextPageToken);
+    const targetIndex = search.pageIndex + 1;
+    window.history.pushState(
+      { pageIndex: targetIndex },
+      "",
+      window.location.href,
+    );
+    await search.fetchPage(getFormState(), formRef, targetIndex);
     resultsRef?.scrollToTop();
   }
 
   async function goPrevPage() {
-    if (!search.prevPageToken && search.pageIndex === 0) return;
-    search.pageIndex--;
-    if (search.pageIndex === 0) {
-      await search.fetchPage(getFormState(), formRef);
-    } else {
-      await search.fetchPage(getFormState(), formRef, search.prevPageToken);
-    }
+    if (search.pageIndex === 0) return;
+    const targetIndex = search.pageIndex - 1;
+    window.history.pushState(
+      { pageIndex: targetIndex },
+      "",
+      window.location.href,
+    );
+    await search.fetchPage(getFormState(), formRef, targetIndex);
     resultsRef?.scrollToTop();
   }
 </script>
 
-<svelte:window onkeydown={onGlobalKeydown} />
+<svelte:head>
+  <title>
+    {search.hasSearched && searchedKeyword
+      ? `${searchedKeyword} - Clean YouTube Search`
+      : "Clean YouTube Search"}
+  </title>
+</svelte:head>
+
+<svelte:window onkeydown={onGlobalKeydown} onpopstate={onPopState} />
 
 <div
   class="flex min-h-screen bg-neutral-950 text-base font-medium text-neutral-100 antialiased lg:h-screen"

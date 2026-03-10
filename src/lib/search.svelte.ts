@@ -1,4 +1,4 @@
-import { SvelteMap } from "svelte/reactivity";
+import { SvelteMap, SvelteDate, SvelteSet } from "svelte/reactivity";
 import {
   searchYouTubeVideos,
   getVideosDetails,
@@ -47,7 +47,9 @@ export function createSearchState() {
   let totalResults = $state<number | undefined>(undefined);
   let resultsPerPage = $state<number | undefined>(undefined);
   let pageIndex = $state(0);
-  const pageCache = new SvelteMap<string, CachedPage>();
+  const pageCache = new SvelteMap<number, CachedPage>();
+  const pageTokens = new SvelteMap<number, string>();
+  pageTokens.set(0, "");
   let isSearching = $state(false);
 
   function applyPage(page: CachedPage) {
@@ -63,7 +65,7 @@ export function createSearchState() {
   async function fetchPage(
     form: SearchFormState,
     formRef: HTMLFormElement | undefined,
-    pageToken?: string,
+    targetPageIndex: number = 0,
   ) {
     if (!apiKey.value || !form.keyword) return;
 
@@ -72,11 +74,19 @@ export function createSearchState() {
       return;
     }
 
-    const cacheKey = pageToken ?? "";
-    const cached = pageCache.get(cacheKey);
+    const cached = pageCache.get(targetPageIndex);
     if (cached) {
       applyPage(cached);
+      pageIndex = targetPageIndex;
       return;
+    }
+
+    const pageToken = pageTokens.get(targetPageIndex);
+    if (pageToken === undefined) {
+      console.error(
+        `Cannot fetch page ${targetPageIndex} without a known token. Resetting to 0.`,
+      );
+      return fetchPage(form, formRef, 0);
     }
 
     isSearching = true;
@@ -94,11 +104,13 @@ export function createSearchState() {
         channelId: form.channelId || undefined,
         eventType: form.eventType || undefined,
         relevanceLanguage: form.relevanceLanguage || undefined,
+
         publishedAfter: form.publishedAfter
-          ? new Date(form.publishedAfter).toISOString()
+          ? new SvelteDate(form.publishedAfter).toISOString()
           : undefined,
+
         publishedBefore: form.publishedBefore
-          ? new Date(form.publishedBefore).toISOString()
+          ? new SvelteDate(form.publishedBefore).toISOString()
           : undefined,
         pageToken: pageToken || undefined,
       };
@@ -108,8 +120,9 @@ export function createSearchState() {
       const videoIds = (searchResult.items ?? [])
         .map((item: SearchResultItem) => item.id?.videoId)
         .filter((v): v is string => Boolean(v));
+
       const channelIds = [
-        ...new Set(
+        ...new SvelteSet(
           (searchResult.items ?? [])
             .map((item: SearchResultItem) => item.snippet?.channelId)
             .filter((v): v is string => Boolean(v)),
@@ -132,8 +145,13 @@ export function createSearchState() {
         resultsPerPage: searchResult.pageInfo?.resultsPerPage,
       };
 
-      pageCache.set(cacheKey, page);
+      if (searchResult.nextPageToken) {
+        pageTokens.set(targetPageIndex + 1, searchResult.nextPageToken);
+      }
+
+      pageCache.set(targetPageIndex, page);
       applyPage(page);
+      pageIndex = targetPageIndex;
       hasSearched = true;
     } catch (e) {
       if (e instanceof ApiError) {
@@ -154,7 +172,26 @@ export function createSearchState() {
 
   function resetCache() {
     pageCache.clear();
+    pageTokens.clear();
+    pageTokens.set(0, "");
     pageIndex = 0;
+  }
+
+  function resetAll() {
+    videos = [];
+    channelMap.clear();
+    hasSearched = false;
+    errorMessage = "";
+    errorStatus = 0;
+    nextPageToken = undefined;
+    prevPageToken = undefined;
+    totalResults = undefined;
+    resultsPerPage = undefined;
+    pageIndex = 0;
+    pageCache.clear();
+    pageTokens.clear();
+    pageTokens.set(0, "");
+    isSearching = false;
   }
 
   return {
@@ -196,5 +233,6 @@ export function createSearchState() {
     },
     fetchPage,
     resetCache,
+    resetAll,
   };
 }
