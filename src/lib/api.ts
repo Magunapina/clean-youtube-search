@@ -185,3 +185,27 @@ export function getChannelsDetails(apiKey: string, channelIds: string[]) {
     id: channelIds.join(","),
   });
 }
+
+/**
+ * Resolves a YouTube @handle to a Channel ID.
+ */
+export async function getChannelIdFromHandle(
+  apiKey: string,
+  handle: string,
+): Promise<string | null> {
+  try {
+    const data = await fetchYouTubeAPI<ChannelsResponse>("channels", apiKey, {
+      part: "id",
+      forHandle: handle,
+    });
+    if (data.items && data.items.length > 0 && data.items[0].id) {
+      return data.items[0].id;
+    }
+    return null;
+  } catch (e) {
+    if (e instanceof ApiError && e.status === 404) {
+      return null;
+    }
+    throw e;
+  }
+}

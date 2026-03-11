@@ -3,6 +3,7 @@ import {
   searchYouTubeVideos,
   getVideosDetails,
   getChannelsDetails,
+  getChannelIdFromHandle,
   ApiError,
   type SearchParams,
   type SearchResultItem,
@@ -94,6 +95,18 @@ export function createSearchState() {
     errorStatus = 0;
 
     try {
+      let resolvedChannelId = form.channelId || undefined;
+      if (resolvedChannelId && resolvedChannelId.startsWith("@")) {
+        const handleId = await getChannelIdFromHandle(
+          apiKey.value,
+          resolvedChannelId,
+        );
+        if (!handleId) {
+          throw new Error(`Account not found for handle: ${resolvedChannelId}`);
+        }
+        resolvedChannelId = handleId;
+      }
+
       const params: SearchParams = {
         q: form.keyword,
         order: form.order,
@@ -101,7 +114,7 @@ export function createSearchState() {
         videoDimension: form.videoDimension,
         videoDuration: form.videoDuration,
         videoLicense: form.videoLicense,
-        channelId: form.channelId || undefined,
+        channelId: resolvedChannelId,
         eventType: form.eventType || undefined,
         relevanceLanguage: form.relevanceLanguage || undefined,
 

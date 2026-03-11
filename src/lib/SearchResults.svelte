@@ -68,15 +68,17 @@
     </div>
   {:else if hasSearched && videos.length === 0}
     <!-- No results -->
-    <div
-      class="flex h-full flex-col items-center justify-center p-6 text-center"
-    >
-      <span class="mb-3 block h-12 w-12 [&>svg]:h-full [&>svg]:w-full"
-        >{@html searchIcon}</span
+    {#if !isSearching}
+      <div
+        class="flex h-full flex-col items-center justify-center p-6 text-center"
       >
-      <p class="text-2xl">No results found.</p>
-      <p class="mt-1 text-xl">Try adjusting your search filters.</p>
-    </div>
+        <span class="mb-3 block h-12 w-12 [&>svg]:h-full [&>svg]:w-full"
+          >{@html searchIcon}</span
+        >
+        <p class="text-2xl">No results found.</p>
+        <p class="mt-1 text-xl">Try adjusting your search filters.</p>
+      </div>
+    {/if}
   {:else if hasSearched}
     <!-- Results list -->
     <div class="grid grid-cols-1 gap-4 px-0 pb-4 lg:gap-0 lg:p-4">

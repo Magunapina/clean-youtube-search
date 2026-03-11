@@ -110,7 +110,7 @@
       value={channelId}
       historyKey="history-channelId"
       oninput={(v) => onupdate("channelId", v)}
-      placeholder="Enter Channel ID (Not a handle)"
+      placeholder="Channel ID or Handle"
     />
 
     <TextField
