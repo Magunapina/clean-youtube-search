@@ -3,6 +3,7 @@
   import { createSearchState, type SearchFormState } from "./lib/search.svelte";
   import SearchSidebar from "./lib/SearchSidebar.svelte";
   import SearchResults from "./lib/SearchResults.svelte";
+  import { addHistory } from "./lib/storage";
   import menuIcon from "./assets/menu.svg?raw";
   import { onMount } from "svelte";
 
@@ -177,6 +178,13 @@
     }
 
     await search.fetchPage(state, formRef, 0);
+
+    // Save to history
+    if (state.keyword) addHistory("history-keyword", state.keyword);
+    if (state.channelId) addHistory("history-channelId", state.channelId);
+    if (state.relevanceLanguage)
+      addHistory("history-language", state.relevanceLanguage);
+
     searchedKeyword = state.keyword;
     sidebarOpen = false;
     resultsRef?.scrollToTop();

@@ -73,17 +73,10 @@
       label="Search Keyword"
       type="text"
       value={keyword}
+      historyKey="history-keyword"
       oninput={(v) => onupdate("keyword", v)}
       placeholder="Enter Keywords"
       required
-    />
-    <TextField
-      id="channel-id"
-      label="Channel ID"
-      type="text"
-      value={channelId}
-      oninput={(v) => onupdate("channelId", v)}
-      placeholder="Enter Channel ID (Not a handle)"
     />
 
     <RadioPills
@@ -111,12 +104,23 @@
     />
 
     <TextField
+      id="channel-id"
+      label="Channel ID"
+      type="text"
+      value={channelId}
+      historyKey="history-channelId"
+      oninput={(v) => onupdate("channelId", v)}
+      placeholder="Enter Channel ID (Not a handle)"
+    />
+
+    <TextField
       id="published-after"
       label="Published After"
       type="datetime-local"
       value={publishedAfter}
       oninput={(v) => onupdate("publishedAfter", v)}
     />
+
     <TextField
       id="published-before"
       label="Published Before"
@@ -124,11 +128,13 @@
       value={publishedBefore}
       oninput={(v) => onupdate("publishedBefore", v)}
     />
+
     <TextField
       id="relevance-language"
       label="Language"
       type="text"
       value={relevanceLanguage}
+      historyKey="history-language"
       oninput={(v) => onupdate("relevanceLanguage", v)}
       placeholder="ISO 639-1"
     />

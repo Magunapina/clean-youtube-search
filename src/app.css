@@ -53,5 +53,5 @@ main {
 /* Fix datetime-local inputs on WebKit */
 input[type="datetime-local"] {
   appearance: none;
-  height: 3rem;
+  height: 2.5rem;
 }
