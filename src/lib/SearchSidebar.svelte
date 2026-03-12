@@ -180,7 +180,7 @@
       <button
         type="button"
         onclick={() => (showApiKey = !showApiKey)}
-        class="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-neutral-700 text-neutral-100 transition-colors hover:text-white"
+        class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-neutral-700 text-neutral-100 transition-colors hover:text-white"
         aria-label={showApiKey ? "Hide API key" : "Show API key"}
       >
         <span class="h-5 w-5 [&>svg]:h-full [&>svg]:w-full">

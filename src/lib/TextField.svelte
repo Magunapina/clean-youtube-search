@@ -157,7 +157,7 @@
             </button>
             <button
               type="button"
-              class="px-4 py-2 transition-colors hover:text-white"
+              class="px-2 py-2 transition-colors hover:text-white"
               onmousedown={handleDropdownRemoveMousedown}
               onclick={createRemoveHistory(item)}
               aria-label="Remove from history"
