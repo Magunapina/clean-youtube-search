@@ -36,10 +36,13 @@
   const filteredHistory = $derived.by(() => {
     if (!historyKey || !allHistory) return [];
     const lowerValue = value.trim().toLowerCase();
-    const filtered = allHistory.filter((h) =>
-      h.toLowerCase().startsWith(lowerValue),
-    );
-    return filtered.slice(0, 10);
+    // Rank by match position (earliest first); the sort is stable, so items
+    // matching at the same position keep history order (newest first)
+    const ranked = allHistory
+      .map((item) => ({ item, index: item.toLowerCase().indexOf(lowerValue) }))
+      .filter(({ index }) => index !== -1)
+      .sort((a, b) => a.index - b.index);
+    return ranked.slice(0, 10).map(({ item }) => item);
   });
 
   let showDropdown = $derived(
