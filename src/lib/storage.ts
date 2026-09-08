@@ -1,5 +1,5 @@
 // History constants
-const MAX_HISTORY_ITEMS = 100;
+const MAX_HISTORY_ITEMS = 1000;
 
 export function getHistory(key: string): string[] {
   try {

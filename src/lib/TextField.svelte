@@ -42,7 +42,9 @@
       .map((item) => ({ item, index: item.toLowerCase().indexOf(lowerValue) }))
       .filter(({ index }) => index !== -1)
       .sort((a, b) => a.index - b.index);
-    return ranked.slice(0, 10).map(({ item }) => item);
+    // Cap the rendered rows: history holds up to MAX_HISTORY_ITEMS, and
+    // building every row at once is wasteful when only ~10 are visible
+    return ranked.slice(0, 100).map(({ item }) => item);
   });
 
   let showDropdown = $derived(
@@ -150,7 +152,7 @@
     </button>
     {#if showDropdown}
       <ul
-        class="absolute top-12 left-0 z-50 w-full overflow-hidden rounded-xl bg-neutral-700 shadow-[0_8px_30px_rgb(0,0,0,0.8)]"
+        class="absolute top-12 left-0 z-50 max-h-[27.5rem] w-full overflow-x-hidden overflow-y-auto overscroll-contain rounded-xl bg-neutral-700 shadow-[0_8px_30px_rgb(0,0,0,0.8)]"
       >
         {#each filteredHistory as item (item)}
           <li
